@@ -25,9 +25,9 @@ while postgress and redis are "healthy"
 
 - Failed attempt and what changed your thinking: first hypothesis matches the evidence so i was right
 - Root cause: `docker-compose.yml` heathcheck test calls `('http://127.0.0.1:8080/healthz')` but `assessment/APPLICATION.md` difine the end point as `/health ` so there is no (z), app never implemnts /healthz so every check gets 404 and docker marks those container as unhealthy after repeated failures
-- Fix: not applied yet
-- Retest evidence: pending
-- Related commit: pending
+- Fix: change healthcheck test in docker-compose.yml form `('http://127.0.0.1:8080/healthz')`to`('http://127.0.0.1:8080/health')`
+- Retest evidence: doing again `docker compose -p barq-assessment ps -a` and it shows that both app-01,app-02 are healthy
+- Related commit:investigation record for healthcheck 404 and duplicate instance
 - Remaining uncertainty:Need to confirm the Flask app actually implements
   `/health` correctly (returns 200) once we look at the app code directly
   the 404 only proves the *path* is wrong, not that `/health` itself works
@@ -42,9 +42,8 @@ while postgress and redis are "healthy"
 - Root cause: app-02's environment block incorrectly overrides INSTANCE_ID
   with "app-01" instead of "app-02"
 - Fix:change app-02's instance with "app-02 in docker-compose.yml
-- Retest evidence:(pending, will confirm via curl to /instance on each
-  container after rebuild)
-- Related commit:pending
+- Retest evidence:`curl -s http://127.0.0.1:8080/instance`
+- Related commit:investigation record for healthcheck 404 and duplicate instance
 - Remaining uncertainty:None on the config itself; still need to verify
   NGINX correctly load-balances between both and returns different IDs
   on repeated requests
