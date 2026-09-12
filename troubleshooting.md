@@ -77,3 +77,20 @@ also when run `docker compose -p barq-assessment logs --tail=50 nginx` shows con
 - Related commit:docs: NGINX port mismatch and app host investigation
 - Remaining uncertainty:/ready, /records, /counter still return
   postgres/redis "unavailable" ,separate issue, under investigation
+
+
+
+## Entry 5/ 12-9-2026 / 9:00 Pm
+- Symptom: when test /ready, it returns `{"postgres":"unavailable","redis":"unavailable"}`
+while postgress and redis container showing healthy in `docker compose ps`
+- Hypothesis: DATABASE_URL , REDIS_URL in config/app.env may not match the actual ports and credentials that postgress and redis container use
+- Command or test: manual review for config/app.env compared with service definition for postgress and redis in docker-compose.yml
+- Actual output: * DATABASE_YRL in app.env pointing to port 5433 while docker-compose.yml pointing to 5432 and this is what postgress service actually use
+*password in app.env ending in 8d while the right one in compose file end in 8c
+*REDIS_URL in app.env pointing to port 6380 while in compose pointing to 6378
+- Failed attempt and what changed your thinking: nothing , everything appear from comparison as i expect
+- Root cause: config/app.env contains wrong port and credentials for postgress DB and redis
+- Fix:pending
+- Retest evidence: pending
+- Related commit: pending
+- Remaining uncertainty: 
