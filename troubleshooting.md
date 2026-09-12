@@ -90,7 +90,10 @@ while postgress and redis container showing healthy in `docker compose ps`
 *REDIS_URL in app.env pointing to port 6380 while in compose pointing to 6378
 - Failed attempt and what changed your thinking: nothing , everything appear from comparison as i expect
 - Root cause: config/app.env contains wrong port and credentials for postgress DB and redis
-- Fix:pending
-- Retest evidence: pending
-- Related commit: pending
+- Fix: corrected DATABASE_URL , REDIS_URL with the actual ports.
+also i notice that app.env is tracked by git as i checked it if it is in ignore file but it does not appear so i stopped tracking it and added config/app.env.example as a safe template and
+  added config/app.env to .gitignore
+- Retest evidence:`curl -i http://127.0.0.1:8080/ready` now shows HTTP/1.1 200 OK 
+also /records return persisted rows and /counter increments everytime
+- Related commit: docs: record problem with app.env file
 - Remaining uncertainty: 
