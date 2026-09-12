@@ -56,9 +56,10 @@ while postgress and redis are "healthy"
 - Failed attempt and what changed your thinking:first i decided to change host dide port mapping instead of nginx.conf as know before that nginx usually listen to port 80 but brief only requires host port 8080 to stay fixed
 so i changed my decision to change the container port to 81 since ports <1024 need root privileges on linix, so 81 avoids running nginx as root
 - Root cause: nginx.conf doesnot match what in docker-compose.yml
-- Fix:pending
-- Retest evidence:pending
-- Related commit:pending
+- Fix: change `listen: 80` to `listen: 81`and
+  `server app-01:8081` to `server app-01:8080` in nginx.conf
+- Retest evidence: nothing happen after rebuild but descover another issue which is in entry 4
+- Related commit: docs: NGINX port mismatch and app host investigation
 - Remaining uncertainty: none
 
 
@@ -71,7 +72,8 @@ also when run `docker compose -p barq-assessment logs --tail=50 nginx` shows con
 - Actual output: 0100007F:1F90 which decodes to 127.0.0.1:8080  and this is not reachable from outside containers 
 - Failed attempt and what changed your thinking:nothing
 - Root cause: docker-compose.yml shared app environmen sets `APP_HOST: "127.0.0.1"` which override the default host 0.0.0.0 and this makes flask bind only to localhost inside its container and unreachable from nginxeven they shaye same network
-- Fix: pending
-- Retest evidence:pending
-- Related commit:pending
-- Remaining uncertainty:pending 
+- Fix: change app host from "127.0.0.1" to "0.0.0.0" in docker-compose.yml
+- Retest evidence:`curl -i http://127.0.0.1:8080/` it returns 200ok now not 502 bad gateway
+- Related commit:docs: NGINX port mismatch and app host investigation
+- Remaining uncertainty:/ready, /records, /counter still return
+  postgres/redis "unavailable" ,separate issue, under investigation
