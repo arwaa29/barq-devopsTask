@@ -47,3 +47,31 @@ while postgress and redis are "healthy"
 - Remaining uncertainty:None on the config itself; still need to verify
   NGINX correctly load-balances between both and returns different IDs
   on repeated requests
+
+## Entry 3 / 12-9-2026 / 12:30 Am
+- Symptom: docker-compose.yml maps host port to container port 81 `["127.0.0.1:${PUBLIC_PORT:-8080}:81"]` while nginx.conf listening to port 80 so there is mismatch between files , alsso noticed  nginx.conf's upstream block pointed app-01 at port 8081 while app-01's actual port is 8080
+- Hypothesis: may be lack of focus to wite right port 
+- Command or test:manual review for docker.compse.yml and nginx.conf
+- Actual output: docker-compose.yml: ports: ["127.0.0.1:${PUBLIC_PORT:-8080}:81"] , nginx.conf: `server app-01:8081`
+- Failed attempt and what changed your thinking:first i decided to change host dide port mapping instead of nginx.conf as know before that nginx usually listen to port 80 but brief only requires host port 8080 to stay fixed
+so i changed my decision to change the container port to 81 since ports <1024 need root privileges on linix, so 81 avoids running nginx as root
+- Root cause: nginx.conf doesnot match what in docker-compose.yml
+- Fix:pending
+- Retest evidence:pending
+- Related commit:pending
+- Remaining uncertainty: none
+
+
+## Entry 4 / 12-9-2026 / 2:30 Am
+- Symptom: nginx returns 502 bad gateway on all routes even after fixing the listen port mismatch
+also when run `docker compose -p barq-assessment logs --tail=50 nginx` shows connect() failed (111: Connection refused)" to app-01/app-02's
+  container IP on port 8080
+- Hypothesis: flask app and nginx may be listen to different interface as i notice that app host in code define the default app host 0.0.0.0 that listen to all interfaces but in docker-compose.yml it reach app through 127.0.0.1:8080 so it may override app host and block any  another interface 
+- Command or test: docker exec app-01 sh -c "cat /proc/net/tcp | grep -i ':1F90'"
+- Actual output: 0100007F:1F90 which decodes to 127.0.0.1:8080  and this is not reachable from outside containers 
+- Failed attempt and what changed your thinking:nothing
+- Root cause: docker-compose.yml shared app environmen sets `APP_HOST: "127.0.0.1"` which override the default host 0.0.0.0 and this makes flask bind only to localhost inside its container and unreachable from nginxeven they shaye same network
+- Fix: pending
+- Retest evidence:pending
+- Related commit:pending
+- Remaining uncertainty:pending 
