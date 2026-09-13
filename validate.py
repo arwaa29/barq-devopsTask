@@ -28,18 +28,23 @@ def record(name, passed, detail=""):
 
 
 def get_json(path, expect_status=None):
-    """GET a path, return (status_code, json_body_or_None)."""
+    """GET a path, return (status_code, json_body_or_None). Body is None if not valid JSON."""
     url = BASE_URL + path
     try:
         with urllib.request.urlopen(url, timeout=TIMEOUT) as resp:
-            body = json.loads(resp.read().decode())
-            return resp.status, body
+            raw = resp.read().decode()
+            try:
+                return resp.status, json.loads(raw)
+            except json.JSONDecodeError:
+                return resp.status, None
     except urllib.error.HTTPError as e:
-        body = json.loads(e.read().decode()) if e.fp else None
-        return e.code, body
+        raw = e.read().decode() if e.fp else ""
+        try:
+            return e.code, json.loads(raw) if raw else None
+        except json.JSONDecodeError:
+            return e.code, None
     except Exception as e:
         return None, str(e)
-
 
 def post_json(path, payload):
     url = BASE_URL + path
@@ -57,6 +62,7 @@ def post_json(path, payload):
 def wait_for_ready(max_wait=20):
     """Bounded wait: poll /ready until it passes or times out."""
     start = time.time()
+    body = None
     while time.time() - start < max_wait:
         status, body = get_json("/ready")
         if status == 200:
