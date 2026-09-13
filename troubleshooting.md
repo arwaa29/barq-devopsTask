@@ -111,7 +111,13 @@ also /records return persisted rows and /counter increments everytime
 - Failed attempt and what changed your thinking: nothing, data doesnot mount correctly as exepected
 - Root cause: named volume point to wrong path which is a backup 
              and tmpfs pointed to real path which means that data stored on RAM cuz of tmpfs so it wiped once container removed
-- Fix: pending
-- Retest evidence: pending
-- Related commit: pending
-- Remaining uncertainty: pending
+- Fix: changed postgres-data volume to point at `/var/lib/postgresql/data` and removes tmpfs that was overriding postgresql normal persistence storage and replace it with temporary one
+- Retest evidence: created a record via POST /records("Persistence
+  test record", id 3) then stopped and remove postgres container then recreate it
+     `docker compose -p barq-assessment stop postgres`
+     `docker compose -p barq-assessment rm -f postgres`
+     `docker compose -p barq-assessment up -d postgres`
+  after that GET /records and it still show the new record i added
+
+- Related commit: docs: explain persistence issue
+- Remaining uncertainty: nothing, persistence confirmed working as required
