@@ -121,3 +121,25 @@ also /records return persisted rows and /counter increments everytime
 
 - Related commit: docs: explain persistence issue
 - Remaining uncertainty: nothing, persistence confirmed working as required
+
+
+
+
+## Entry 7 / 13-9-2026 / 4:30 pm 
+- Symptom: nothing, just proof of capability test not a bug
+- Hypothesis: nothing
+- Command or test: *created records 1-5
+                   *ran ./backup.sh, 
+                   *added record 6 post-backup
+                   *ran ./restore.sh with the backup file.
+- Actual output:Before restore: `GET /records showed 6 records (1-6)`
+                After restore: `GET /records shows 5 records (1-5)` record 6 removed, matching the pre-backup state exactly
+- Failed attempt and what changed your thinking: nothing
+- Root cause:nothing
+- Fix:nothing
+- Retest evidence: backup.sh created ./backups/backup_20260913_161349.dump
+  (2327 bytes); restore.sh restored it successfully, confirmed via both
+  the script's own row count (5) and a direct GET /records call showing
+  the exact same 5 records as before the post-backup insert
+- Related commit:pending
+- Remaining uncertainty: nothing, backup/restore cycle proven working
