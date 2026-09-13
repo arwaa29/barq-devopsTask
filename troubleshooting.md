@@ -97,3 +97,21 @@ also i notice that app.env is tracked by git as i checked it if it is in ignore 
 also /records return persisted rows and /counter increments everytime
 - Related commit: docs: record problem with app.env file
 - Remaining uncertainty: 
+
+
+## Entry 6 / 13-9-2026 / 4:00 AM
+- Symptom: observed in docker-compose.yml that named volume pointed to wrong path that not used by postgress 
+- Hypothesis: data doesnot mount correctly
+- Command or test: manual review of docker-compose.yml to see how data is mounted
+- Actual output: found in docker-compose.yml 
+        volumes:
+          postgres-data:/var/lib/postgresql/backup 
+        tmpfs: [/var/lib/postgresql/data]
+  so postgress-data which is the volume name pointed to backup and tmpfs pointed to real path
+- Failed attempt and what changed your thinking: nothing, data doesnot mount correctly as exepected
+- Root cause: named volume point to wrong path which is a backup 
+             and tmpfs pointed to real path which means that data stored on RAM cuz of tmpfs so it wiped once container removed
+- Fix: pending
+- Retest evidence: pending
+- Related commit: pending
+- Remaining uncertainty: pending
