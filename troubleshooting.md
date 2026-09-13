@@ -141,5 +141,5 @@ also /records return persisted rows and /counter increments everytime
   (2327 bytes); restore.sh restored it successfully, confirmed via both
   the script's own row count (5) and a direct GET /records call showing
   the exact same 5 records as before the post-backup insert
-- Related commit:pending
+- Related commit: docs: verify backup/restore cycle
 - Remaining uncertainty: nothing, backup/restore cycle proven working
