@@ -143,3 +143,31 @@ also /records return persisted rows and /counter increments everytime
   the exact same 5 records as before the post-backup insert
 - Related commit: docs: verify backup/restore cycle
 - Remaining uncertainty: nothing, backup/restore cycle proven working
+
+
+
+## Entry 8 / 13-9-2026 / 6:30
+- Symptom: CI run #1 failed ,validate.py crashed with JSONDecodeError
+  when parsing an HTTP error response
+- Hypothesis: On a fresh runner, containers start cold; NGINX may return
+  a 502 (HTML body) before backends are ready, and get_json() assumed
+  all error bodies were JSON
+- Command or test: Reviewed CI logs at
+  `https://github.com/arwaa29/barq-devopsTask/actions/runs/34764824583`
+- Actual output: Traceback showed json.decoder.JSONDecodeError while
+  parsing an HTTPError response body
+- Failed attempt and what changed your thinking:nothing
+- Root cause:get_json() called json.loads() on error response bodies
+  unconditionally, without handling non-JSON (HTML) error pages that
+  NGINX returns during a transient 502 while backends are still starting
+- Fix: Wrapped JSON parsing in try/except json.JSONDecodeError in
+  get_json(), returning None for the body instead of crashing when the
+  response isn't valid JSON
+- Retest evidence: CI run #2 passed green:
+  `https://github.com/arwaa29/barq-devopsTask/actions/runs/34765878010`
+- Related commit:
+- Remaining uncertainty:
+
+
+
+
