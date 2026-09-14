@@ -168,7 +168,7 @@ also /records return persisted rows and /counter increments everytime
 - Related commit:
 - Remaining uncertainty:
 
-## Entry 9 / 14-9-2026
+## Entry 9 / 14-9-2026 / 1:20 pm
 - Symptom: ./video_challenge.sh repeatedly failed with "Repair the environment
   first: every service must be healthy and unpaused" even when docker compose
   ps -a showed all services as healthy.
@@ -185,9 +185,11 @@ also /records return persisted rows and /counter increments everytime
   assigns a "healthy" status without one configured, so video_challenge.sh's
   precondition (all 5 services must show Health.Status == "healthy") could
   never pass for nginx specifically.
-- Fix: pending
-- Retest evidence: pending
-- Related commit: pending
+- Fix: Added a healthcheck to the nginx service using wget (already present
+  in the nginx:alpine image) against http://127.0.0.1:81/
+- Retest evidence:`docker inspect nginx` now shows "Status":"healthy" after
+  the service restarts and the healthcheck runs successfully
+- Related commit: docs: record NGINX healthcheck
 - Remaining uncertainty: None
 
 
