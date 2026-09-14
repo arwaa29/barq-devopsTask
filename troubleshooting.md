@@ -168,6 +168,26 @@ also /records return persisted rows and /counter increments everytime
 - Related commit:
 - Remaining uncertainty:
 
-
+## Entry 9 / 14-9-2026
+- Symptom: ./video_challenge.sh repeatedly failed with "Repair the environment
+  first: every service must be healthy and unpaused" even when docker compose
+  ps -a showed all services as healthy.
+- Hypothesis: Initially assumed a timing issue (app-01 not fully stable after
+  failure_test.py); adding a wait/sleep did not fix it.
+- Command or test: `docker inspect nginx --format='{{json .State.Health}}'`
+- Actual output: null — nginx had no health status at all, since the nginx
+  service in docker-compose.yml never had a healthcheck: block defined.
+- Failed attempt and what changed your thinking: Assumed longer waits would
+  fix it (matching the pattern from earlier container-startup issues); this
+  did not help, which led to directly inspecting nginx's health status rather
+  than continuing to guess about timing.
+- Root cause: nginx service was missing a healthcheck entirely; Docker never
+  assigns a "healthy" status without one configured, so video_challenge.sh's
+  precondition (all 5 services must show Health.Status == "healthy") could
+  never pass for nginx specifically.
+- Fix: pending
+- Retest evidence: pending
+- Related commit: pending
+- Remaining uncertainty: None
 
 
