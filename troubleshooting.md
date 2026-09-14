@@ -192,4 +192,8 @@ also /records return persisted rows and /counter increments everytime
 - Related commit: docs: record NGINX healthcheck
 - Remaining uncertainty: None
 
+## Entry 10 / 14-9-2026 / 2:50 pm
+ there is another bug related also to video, i will try to fix it while waiting to hear back from u :(
+
+
 
